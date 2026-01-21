@@ -27,6 +27,12 @@ $wingetResult = winget install --id Rustlang.Rustup --silent --accept-package-ag
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "    Rustup installed via winget" -ForegroundColor Green
+    # Refresh PATH and install stable toolchain
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    $cargoBin = Join-Path $env:USERPROFILE ".cargo\bin"
+    $env:Path = "$cargoBin;$env:Path"
+    Write-Host "    Installing stable toolchain..." -ForegroundColor Gray
+    rustup default stable 2>$null
 } else {
     # Fallback to direct download
     Write-Host "    Winget failed, downloading rustup-init..." -ForegroundColor Yellow
@@ -93,7 +99,6 @@ foreach ($tool in $tools) {
 
 # Verify installation
 Write-Host "`n  Rust installation complete:" -ForegroundColor Green
-$env:Path = "$cargoBin;$env:Path"
 rustc --version 2>$null
 cargo --version 2>$null
 
