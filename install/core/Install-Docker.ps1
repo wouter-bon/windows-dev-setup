@@ -26,6 +26,8 @@ if ($dockerCmd) {
         $installerUrl = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
         $installerPath = Join-Path $env:TEMP "DockerDesktopInstaller.exe"
         
+        # Validate URL before download
+        if ($installerUrl -notmatch '^https://desktop\.docker\.com/win/main/amd64/Docker%20Desktop%20Installer\.exe$') { throw "Unexpected Docker installer URL: $installerUrl" }
         Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
         Start-Process -FilePath $installerPath -ArgumentList "install", "--quiet", "--accept-license", "--backend=wsl-2" -Wait
         Remove-Item $installerPath -Force -ErrorAction SilentlyContinue

@@ -27,6 +27,8 @@ if ($cfg.install.nerd_fonts) {
         $fontZip = Join-Path $env:TEMP "CascadiaCode.zip"
         $fontDir = Join-Path $env:TEMP "CascadiaCode"
 
+        # Validate URL before download
+        if ($fontUrl -notmatch '^https://github\.com/ryanoasis/nerd-fonts/releases/download/v[0-9.]+/.*\.zip$') { throw "Unexpected font URL: $fontUrl" }
         Invoke-WebRequest -Uri $fontUrl -OutFile $fontZip -UseBasicParsing
 
         # Validate download succeeded

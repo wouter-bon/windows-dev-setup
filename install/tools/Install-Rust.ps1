@@ -40,6 +40,8 @@ if ($LASTEXITCODE -eq 0) {
         $rustupUrl = "https://win.rustup.rs/x86_64"
         $rustupPath = Join-Path $env:TEMP "rustup-init.exe"
 
+        # Validate URL before download
+        if ($rustupUrl -notmatch '^https://win\.rustup\.rs/x86_64$') { throw "Unexpected rustup URL: $rustupUrl" }
         Invoke-WebRequest -Uri $rustupUrl -OutFile $rustupPath -UseBasicParsing
 
         if (!(Test-Path $rustupPath) -or (Get-Item $rustupPath).Length -lt 1MB) {

@@ -81,14 +81,63 @@ if (!(Test-Path $copilotConfigDir)) {
     New-Item -ItemType Directory -Path $copilotConfigDir -Force | Out-Null
 }
 
+# Verify/configure GitHub authentication with Copilot scope
+Write-Host "  Verifying GitHub authentication for Copilot..." -ForegroundColor Gray
+
+$ghCmd = Get-Command gh -ErrorAction SilentlyContinue
+if ($ghCmd) {
+    # Check if logged in
+    $authStatus = gh auth status 2>&1
+    if ($authStatus -match "Logged in") {
+        # Check if copilot scope is present
+        $scopes = gh auth status 2>&1 | Select-String "Token scopes"
+        if ($scopes -notmatch "copilot") {
+            Write-Host "    Adding copilot scope to authentication..." -ForegroundColor Yellow
+            gh auth refresh -s copilot 2>$null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Host "    Copilot scope added successfully" -ForegroundColor Green
+            } else {
+                Write-Host "    Run: gh auth refresh -s copilot" -ForegroundColor Yellow
+            }
+        } else {
+            Write-Host "    GitHub auth configured with copilot scope" -ForegroundColor DarkGray
+        }
+    } else {
+        Write-Host "    Not logged in - will need: gh auth login -s copilot" -ForegroundColor Yellow
+    }
+}
+
+# Create helper function in PowerShell profile to refresh copilot auth
+$profilePath = Join-Path $env:USERPROFILE "Downloads\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+if (Test-Path $profilePath) {
+    $profileContent = Get-Content $profilePath -Raw
+    if ($profileContent -notlike "*copilot-refresh*") {
+        $refreshFunction = @'
+
+# Copilot CLI helper - refresh auth if token expired
+function copilot-refresh {
+    Write-Host "Refreshing GitHub Copilot authentication..." -ForegroundColor Cyan
+    gh auth refresh -s copilot
+    if ($LASTEXITCODE -eq 0) {
+        Write-Host "Authentication refreshed. Run 'copilot' to start." -ForegroundColor Green
+    }
+}
+'@
+        Add-Content -Path $profilePath -Value $refreshFunction
+        Write-Host "    Added copilot-refresh helper to profile" -ForegroundColor DarkGray
+    }
+}
+
 Write-Host @"
 
   GitHub CLI & Copilot CLI installed:
-    gh auth login     - Authenticate GitHub CLI
-    copilot           - Start Copilot CLI session
-    /login            - Authenticate in Copilot CLI
-    /model            - Select AI model (Sonnet 4.5 default)
-    /help             - Show commands
+    gh auth login -s copilot  - Authenticate with Copilot scope
+    gh auth refresh -s copilot - Refresh token (if expired)
+    copilot-refresh           - Helper to refresh auth
+    copilot                   - Start Copilot CLI session
+
+  NOTE: If you see "Failed to get token" error, run:
+        gh auth refresh -s copilot
 
 "@ -ForegroundColor Cyan
 

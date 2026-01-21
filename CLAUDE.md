@@ -86,3 +86,9 @@ When copying files that may be in use (fonts, configs), check if destination exi
 
 ### Config Property Access
 Always validate `$cfg.resources.allocation_percent` and similar values are within valid ranges before using in calculations to avoid division by zero.
+
+### GitHub Copilot CLI Authentication
+The Copilot CLI requires the `copilot` OAuth scope. Default `gh auth login` doesn't include it. Users will see "Failed to get token" errors without it.
+- Initial auth: `gh auth login -s copilot`
+- Add scope later: `gh auth refresh -s copilot`
+- Helper function: `copilot-refresh` (added to PowerShell profile)

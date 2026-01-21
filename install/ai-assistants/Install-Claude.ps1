@@ -27,6 +27,8 @@ if ($cfg.install.claude_desktop) {
                 $installerUrl = "https://storage.googleapis.com/osprey-downloads-c02f6a0d-347c-492b-a752-3e0651722e97/nest-win-x64/Claude-Setup-x64.exe"
                 $installerPath = Join-Path $env:TEMP "ClaudeSetup.exe"
                 
+                # Validate URL before download
+                if ($installerUrl -notmatch '^https://claude\.ai/installer/claude-windows\.exe$') { throw "Unexpected Claude installer URL: $installerUrl" }
                 Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath -UseBasicParsing
                 Start-Process -FilePath $installerPath -ArgumentList "/S" -Wait
                 Remove-Item $installerPath -Force -ErrorAction SilentlyContinue
