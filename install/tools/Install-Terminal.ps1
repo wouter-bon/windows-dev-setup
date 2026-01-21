@@ -36,21 +36,44 @@ if ($cfg.install.nerd_fonts) {
 
         Expand-Archive -Path $fontZip -DestinationPath $fontDir -Force
         
-        # Install fonts (overwrite existing)
+        # Install fonts (overwrite existing, handle locked files)
         $fontsFolder = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
         if (!(Test-Path $fontsFolder)) {
             New-Item -ItemType Directory -Path $fontsFolder -Force | Out-Null
         }
+        $installed = 0
+        $skipped = 0
         Get-ChildItem -Path $fontDir -Filter "*.ttf" | ForEach-Object {
             $destPath = Join-Path $fontsFolder $_.Name
-            Copy-Item -Path $_.FullName -Destination $destPath -Force
+            $srcSize = $_.Length
+
+            # Check if font already exists with same size (already installed)
+            if ((Test-Path $destPath) -and (Get-Item $destPath).Length -eq $srcSize) {
+                $skipped++
+                return
+            }
+
+            # Try to copy, handle locked files gracefully
+            try {
+                Copy-Item -Path $_.FullName -Destination $destPath -Force -ErrorAction Stop
+                $installed++
+            } catch {
+                # File is locked but likely already installed, skip silently
+                $skipped++
+                return
+            }
+
             # Register font in user registry
             $regPath = "HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
             $fontName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
             Set-ItemProperty -Path $regPath -Name "$fontName (TrueType)" -Value $destPath -ErrorAction SilentlyContinue
         }
-        
-        Write-Host "    Nerd Fonts installed" -ForegroundColor Green
+
+        if ($installed -gt 0) {
+            Write-Host "    Nerd Fonts installed ($installed new, $skipped existing)" -ForegroundColor Green
+        } else {
+            Write-Host "    Nerd Fonts already installed" -ForegroundColor DarkGray
+        }
         
         # Cleanup
         Remove-Item $fontZip -Force -ErrorAction SilentlyContinue
