@@ -32,7 +32,8 @@
         "claude_code": true,
         "oh_my_posh": true,
         "7zip": true,
-        "jq": true
+        "jq": true,
+        "rust": true
     },
     
     "vscode": {

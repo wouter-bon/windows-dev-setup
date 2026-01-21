@@ -227,6 +227,7 @@ try {
     
     # ========== PHASE 3: Development Tools ==========
     Invoke-Script "$InstallTools\Install-VSCode.ps1" "Installing VS Code & Extensions" $cfg | Out-Null
+    Invoke-Script "$InstallTools\Install-Rust.ps1" "Installing Rust Toolchain" $cfg | Out-Null
     Invoke-Script "$InstallAI\Install-GitHubCopilot.ps1" "Installing GitHub CLI & Copilot CLI" $cfg | Out-Null
     Invoke-Script "$InstallAI\Install-Claude.ps1" "Installing Claude Desktop & Claude Code" $cfg | Out-Null
     

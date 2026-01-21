@@ -43,14 +43,16 @@ function glog { git log --oneline --graph --decorate -20 @args }
 function dps { docker ps @args }
 function di { docker images @args }
 
-# Environment - ensure Node.js and npm-global are in PATH
+# Environment - ensure Node.js, Rust, and npm-global are in PATH
 $env:EDITOR = "code --wait"
 $nodePath = "C:\Program Files\nodejs"
 $npmGlobal = Join-Path $env:USERPROFILE ".npm-global"
 $localBin = Join-Path $env:USERPROFILE ".local\bin"
+$cargoBin = Join-Path $env:USERPROFILE ".cargo\bin"
 if ($env:Path -notlike "*nodejs*") { $env:Path = "$nodePath;$env:Path" }
 if ($env:Path -notlike "*$npmGlobal*") { $env:Path = "$npmGlobal;$env:Path" }
 if ($env:Path -notlike "*$localBin*") { $env:Path = "$localBin;$env:Path" }
+if (($env:Path -notlike "*\.cargo\bin*") -and (Test-Path $cargoBin)) { $env:Path = "$cargoBin;$env:Path" }
 
 # Simple prompt (Oh-My-Posh will override if installed)
 function prompt {

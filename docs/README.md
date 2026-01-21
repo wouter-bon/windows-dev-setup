@@ -10,7 +10,7 @@ Fully automated deployment of a modern Windows development environment.
 | **Distributions** | Ubuntu 24.04 LTS, Kali Linux |
 | **Containers** | Docker Desktop (WSL2 backend) |
 | **AI Assistants** | GitHub Copilot CLI, Claude Code, VS Code Copilot |
-| **Dev Tools** | Git, Node.js, Python, PowerShell 7 |
+| **Dev Tools** | Git, Node.js, Python, Rust, PowerShell 7 |
 | **Terminal** | Windows Terminal, Oh-My-Posh, Nerd Fonts |
 
 ## Quick Start
