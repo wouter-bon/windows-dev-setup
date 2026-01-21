@@ -43,10 +43,12 @@ function glog { git log --oneline --graph --decorate -20 @args }
 function dps { docker ps @args }
 function di { docker images @args }
 
-# Environment
+# Environment - ensure Node.js and npm-global are in PATH
 $env:EDITOR = "code --wait"
+$nodePath = "C:\Program Files\nodejs"
 $npmGlobal = Join-Path $env:USERPROFILE ".npm-global"
 $localBin = Join-Path $env:USERPROFILE ".local\bin"
+if ($env:Path -notlike "*nodejs*") { $env:Path = "$nodePath;$env:Path" }
 if ($env:Path -notlike "*$npmGlobal*") { $env:Path = "$npmGlobal;$env:Path" }
 if ($env:Path -notlike "*$localBin*") { $env:Path = "$localBin;$env:Path" }
 
@@ -72,26 +74,37 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
 }
 '@
 
-# Create profile directories and write PowerShell 5 profile
-try {
-    $profileDir = Split-Path $PROFILE -Parent
-    if (!(Test-Path $profileDir)) {
-        New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
-    }
-    $psProfileContent | Set-Content -Path $PROFILE -Encoding UTF8
-    Write-Host "    PowerShell profile: $PROFILE" -ForegroundColor DarkGray
-} catch {
-    # Fallback to standard Documents location if OneDrive path fails
-    $fallbackProfile = Join-Path $env:USERPROFILE "Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
-    $fallbackDir = Split-Path $fallbackProfile -Parent
-    if (!(Test-Path $fallbackDir)) {
-        New-Item -ItemType Directory -Path $fallbackDir -Force | Out-Null
-    }
-    $psProfileContent | Set-Content -Path $fallbackProfile -Encoding UTF8
-    Write-Host "    PowerShell profile: $fallbackProfile (fallback)" -ForegroundColor DarkGray
+# Use Downloads\WindowsPowerShell to avoid OneDrive sync issues
+$customProfileDir = Join-Path $env:USERPROFILE "Downloads\WindowsPowerShell"
+$customProfile = Join-Path $customProfileDir "Microsoft.PowerShell_profile.ps1"
+
+if (!(Test-Path $customProfileDir)) {
+    New-Item -ItemType Directory -Path $customProfileDir -Force | Out-Null
+}
+$psProfileContent | Set-Content -Path $customProfile -Encoding UTF8
+Write-Host "    PowerShell profile: $customProfile" -ForegroundColor DarkGray
+
+# Add loader to system-wide profile to source from Downloads
+$systemProfile = "C:\Windows\System32\WindowsPowerShell\v1.0\profile.ps1"
+$loaderContent = @"
+
+# Load user profile from Downloads (bypass OneDrive)
+`$customProfile = Join-Path `$env:USERPROFILE "Downloads\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+if (Test-Path `$customProfile) {
+    . `$customProfile
+}
+"@
+
+$existingContent = ""
+if (Test-Path $systemProfile) {
+    $existingContent = Get-Content $systemProfile -Raw -ErrorAction SilentlyContinue
+}
+if ($existingContent -notlike "*Downloads\WindowsPowerShell*") {
+    Add-Content -Path $systemProfile -Value $loaderContent
+    Write-Host "    System profile loader added" -ForegroundColor DarkGray
 }
 
-# Write PowerShell 7 profile
+# Also write to PowerShell 7 profile location
 $ps7Profile = Join-Path $env:USERPROFILE "Documents\PowerShell\Microsoft.PowerShell_profile.ps1"
 $ps7ProfileDir = Split-Path $ps7Profile -Parent
 if (!(Test-Path $ps7ProfileDir)) {
