@@ -17,30 +17,7 @@ PowerShell-based automated deployment system for Windows development environment
 ```
 
 ### Individual Scripts
-Each component can run standalone:
-```powershell
-# Core installations
-.\install\core\Install-WindowsFeatures.ps1
-.\install\core\Install-WSLDistros.ps1
-.\install\core\Install-Docker.ps1
-
-# Tools
-.\install\tools\Install-DevTools.ps1
-.\install\tools\Install-Terminal.ps1
-.\install\tools\Install-VSCode.ps1
-
-# AI assistants
-.\install\ai-assistants\Install-GitHubCopilot.ps1
-.\install\ai-assistants\Install-Claude.ps1
-
-# Configuration
-.\configure\wsl\Configure-WSL.ps1
-.\configure\wsl\Configure-Firewall.ps1
-.\configure\terminal\Configure-ShellProfiles.ps1
-.\configure\terminal\Configure-OhMyPosh.ps1
-.\configure\environment\Configure-Git.ps1
-.\configure\environment\Configure-Environment.ps1
-```
+Individual scripts require `$env:DEPLOY_CONFIG` to be set by Deploy.ps1 - they cannot run standalone. To test a single script, run the full deployment with `-Force`.
 
 ## Architecture
 
@@ -82,3 +59,30 @@ All PowerShell scripts follow a consistent pattern:
 - `Deploy.ps1` - Main orchestrator with phase management
 - `.state.json` - Deployment progress (auto-generated)
 - `docs/bash_profile_additions.sh` - Template copied to Ubuntu's .bashrc
+
+## Coding Conventions
+
+### Avoid Unicode Characters
+Use ASCII only in PowerShell strings. Unicode symbols (`✓`, `→`, `○`, `✗`) cause parsing errors in some PowerShell environments. Use alternatives:
+- `[OK]` instead of `✓`
+- `[X]` instead of `✗`
+- `->` or descriptive text instead of `→`
+
+### Handle OneDrive-Redirected Paths
+The `$PROFILE` variable may point to OneDrive (`OneDrive - Company\Documents\...`). Always wrap profile operations in try/catch with a fallback to `$env:USERPROFILE\Documents\...`.
+
+### Firewall Port Arrays
+`New-NetFirewallRule -LocalPort` expects a comma-separated string, not an array. Convert config arrays:
+```powershell
+$ports = if ($cfg.security.allowed_ports -is [array]) {
+    $cfg.security.allowed_ports -join ','
+} else {
+    $cfg.security.allowed_ports
+}
+```
+
+### Locked File Handling
+When copying files that may be in use (fonts, configs), check if destination exists with same size before copying, and wrap in try/catch to skip gracefully.
+
+### Config Property Access
+Always validate `$cfg.resources.allocation_percent` and similar values are within valid ranges before using in calculations to avoid division by zero.
