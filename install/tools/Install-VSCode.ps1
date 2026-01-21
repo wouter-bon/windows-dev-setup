@@ -48,7 +48,7 @@ foreach ($ext in $extensions) {
     $result = & code --install-extension $ext --force 2>&1
     
     if ($LASTEXITCODE -eq 0 -or $result -match "already installed") {
-        Write-Host " ✓" -ForegroundColor Green
+        Write-Host " OK" -ForegroundColor Green
     } else {
         Write-Host " (skipped)" -ForegroundColor Yellow
     }

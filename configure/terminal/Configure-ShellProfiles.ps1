@@ -72,15 +72,24 @@ if (Get-Command oh-my-posh -ErrorAction SilentlyContinue) {
 }
 '@
 
-# Create profile directories
-$profileDir = Split-Path $PROFILE -Parent
-if (!(Test-Path $profileDir)) {
-    New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+# Create profile directories and write PowerShell 5 profile
+try {
+    $profileDir = Split-Path $PROFILE -Parent
+    if (!(Test-Path $profileDir)) {
+        New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
+    }
+    $psProfileContent | Set-Content -Path $PROFILE -Encoding UTF8
+    Write-Host "    PowerShell profile: $PROFILE" -ForegroundColor DarkGray
+} catch {
+    # Fallback to standard Documents location if OneDrive path fails
+    $fallbackProfile = Join-Path $env:USERPROFILE "Documents\WindowsPowerShell\Microsoft.PowerShell_profile.ps1"
+    $fallbackDir = Split-Path $fallbackProfile -Parent
+    if (!(Test-Path $fallbackDir)) {
+        New-Item -ItemType Directory -Path $fallbackDir -Force | Out-Null
+    }
+    $psProfileContent | Set-Content -Path $fallbackProfile -Encoding UTF8
+    Write-Host "    PowerShell profile: $fallbackProfile (fallback)" -ForegroundColor DarkGray
 }
-
-# Write PowerShell 5 profile
-$psProfileContent | Set-Content -Path $PROFILE -Encoding UTF8
-Write-Host "    PowerShell profile: $PROFILE" -ForegroundColor DarkGray
 
 # Write PowerShell 7 profile
 $ps7Profile = Join-Path $env:USERPROFILE "Documents\PowerShell\Microsoft.PowerShell_profile.ps1"

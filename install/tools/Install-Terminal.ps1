@@ -36,10 +36,18 @@ if ($cfg.install.nerd_fonts) {
 
         Expand-Archive -Path $fontZip -DestinationPath $fontDir -Force
         
-        # Install fonts
-        $fonts = (New-Object -ComObject Shell.Application).Namespace(0x14)
+        # Install fonts (overwrite existing)
+        $fontsFolder = "$env:LOCALAPPDATA\Microsoft\Windows\Fonts"
+        if (!(Test-Path $fontsFolder)) {
+            New-Item -ItemType Directory -Path $fontsFolder -Force | Out-Null
+        }
         Get-ChildItem -Path $fontDir -Filter "*.ttf" | ForEach-Object {
-            $fonts.CopyHere($_.FullName, 0x10)
+            $destPath = Join-Path $fontsFolder $_.Name
+            Copy-Item -Path $_.FullName -Destination $destPath -Force
+            # Register font in user registry
+            $regPath = "HKCU:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Fonts"
+            $fontName = [System.IO.Path]::GetFileNameWithoutExtension($_.Name)
+            Set-ItemProperty -Path $regPath -Name "$fontName (TrueType)" -Value $destPath -ErrorAction SilentlyContinue
         }
         
         Write-Host "    Nerd Fonts installed" -ForegroundColor Green

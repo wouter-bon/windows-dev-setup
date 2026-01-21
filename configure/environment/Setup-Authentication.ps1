@@ -32,23 +32,23 @@ $ghCmd = Get-Command gh -ErrorAction SilentlyContinue
 if ($ghCmd) {
     $authStatus = gh auth status 2>&1
     if ($authStatus -match "Logged in") {
-        Write-Host "    ✓ Already authenticated" -ForegroundColor Green
+        Write-Host "    [OK] Already authenticated" -ForegroundColor Green
     } else {
-        Write-Host "    ○ Not authenticated" -ForegroundColor Yellow
+        Write-Host "    [  ] Not authenticated" -ForegroundColor Yellow
         Write-Host "      Run: gh auth login" -ForegroundColor DarkGray
     }
 } else {
-    Write-Host "    ✗ Not installed" -ForegroundColor Red
+    Write-Host "    [X] Not installed" -ForegroundColor Red
 }
 
 # Check Copilot CLI
 Write-Host "`n  Copilot CLI Status:" -ForegroundColor Magenta
 $copilotCmd = Get-Command copilot -ErrorAction SilentlyContinue
 if ($copilotCmd) {
-    Write-Host "    ✓ Installed" -ForegroundColor Green
-    Write-Host "      Authenticate on first run: copilot → /login" -ForegroundColor DarkGray
+    Write-Host "    [OK] Installed" -ForegroundColor Green
+    Write-Host "      Authenticate: run 'copilot' then type '/login'" -ForegroundColor DarkGray
 } else {
-    Write-Host "    ○ Not found in PATH" -ForegroundColor Yellow
+    Write-Host "    [  ] Not found in PATH" -ForegroundColor Yellow
     Write-Host "      Install: npm install -g @github/copilot" -ForegroundColor DarkGray
 }
 
@@ -56,10 +56,10 @@ if ($copilotCmd) {
 Write-Host "`n  Claude Code Status:" -ForegroundColor Magenta
 $claudeCmd = Get-Command claude -ErrorAction SilentlyContinue
 if ($claudeCmd) {
-    Write-Host "    ✓ Installed" -ForegroundColor Green
-    Write-Host "      Authenticate on first run: claude → /login" -ForegroundColor DarkGray
+    Write-Host "    [OK] Installed" -ForegroundColor Green
+    Write-Host "      Authenticate: run 'claude' then type '/login'" -ForegroundColor DarkGray
 } else {
-    Write-Host "    ○ Not found in PATH" -ForegroundColor Yellow
+    Write-Host "    [  ] Not found in PATH" -ForegroundColor Yellow
     Write-Host "      Install from code.claude.ai or via winget" -ForegroundColor DarkGray
 }
 
@@ -71,7 +71,7 @@ Write-Host @"
 
   GitHub CLI:
     gh auth login
-    (Select: GitHub.com → HTTPS → Login with browser)
+    (Select: GitHub.com, then HTTPS, then Login with browser)
 
   Copilot CLI:
     copilot
