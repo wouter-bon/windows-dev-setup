@@ -1,0 +1,13 @@
+# Deployment state and logs
+.state.json
+logs/
+
+# Editor
+.vscode/
+*.swp
+*~
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store

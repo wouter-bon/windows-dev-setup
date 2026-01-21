@@ -1,0 +1,87 @@
+{
+    "_readme": "Windows Development Environment Configuration - Edit before running Deploy.ps1",
+    
+    "user": {
+        "name": "Wouter Bon",
+        "email": "wouter.bon@inlumi.com",
+        "github_username": ""
+    },
+    
+    "resources": {
+        "wsl_memory_gb": "auto",
+        "wsl_processors": "auto",
+        "wsl_swap_gb": 4,
+        "auto_detect": true,
+        "allocation_percent": 60
+    },
+    
+    "install": {
+        "wsl_ubuntu": true,
+        "wsl_kali": true,
+        "docker": true,
+        "git": true,
+        "nodejs": true,
+        "python": true,
+        "powershell7": true,
+        "windows_terminal": true,
+        "nerd_fonts": true,
+        "vscode": true,
+        "github_cli": true,
+        "copilot_cli": true,
+        "claude_desktop": true,
+        "claude_code": true,
+        "oh_my_posh": true,
+        "7zip": true,
+        "jq": true
+    },
+    
+    "vscode": {
+        "extensions": {
+            "essential": [
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "ms-vscode-remote.remote-wsl",
+                "ms-vscode-remote.remote-containers",
+                "ms-azuretools.vscode-docker"
+            ],
+            "recommended": [
+                "eamodio.gitlens",
+                "usernamehw.errorlens",
+                "esbenp.prettier-vscode",
+                "EditorConfig.EditorConfig"
+            ],
+            "optional": [
+                "PKief.material-icon-theme",
+                "ms-python.python",
+                "dbaeumer.vscode-eslint"
+            ]
+        },
+        "install_optional": true
+    },
+    
+    "wsl": {
+        "networking_mode": "mirrored",
+        "dns_tunneling": true,
+        "auto_proxy": true,
+        "ubuntu_packages": [
+            "build-essential", "curl", "wget", "git", "vim", "htop",
+            "tree", "unzip", "jq", "ripgrep", "python3", "python3-pip"
+        ],
+        "kali_tools": [
+            "nmap", "nikto", "sqlmap", "wpscan", "dirb", "gobuster",
+            "hydra", "metasploit-framework"
+        ]
+    },
+    
+    "security": {
+        "disable_telemetry": true,
+        "firewall_mode": "specific_ports",
+        "allowed_ports": [80, 443, 3000, 3001, 4200, 5000, 5173, 8000, 8080, 8443, 9000]
+    },
+    
+    "paths": {
+        "projects": "C:\\Projects",
+        "tools": "C:\\Tools",
+        "create_directories": true
+    }
+}
