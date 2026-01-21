@@ -43,12 +43,14 @@ function glog { git log --oneline --graph --decorate -20 @args }
 function dps { docker ps @args }
 function di { docker images @args }
 
-# Environment - ensure Node.js, Rust, and npm-global are in PATH
+# Environment - ensure all dev tools are in PATH
 $env:EDITOR = "code --wait"
+$pwsh7Path = "C:\Program Files\PowerShell\7"
 $nodePath = "C:\Program Files\nodejs"
 $npmGlobal = Join-Path $env:USERPROFILE ".npm-global"
 $localBin = Join-Path $env:USERPROFILE ".local\bin"
 $cargoBin = Join-Path $env:USERPROFILE ".cargo\bin"
+if ($env:Path -notlike "*PowerShell\7*") { $env:Path = "$pwsh7Path;$env:Path" }
 if ($env:Path -notlike "*nodejs*") { $env:Path = "$nodePath;$env:Path" }
 if ($env:Path -notlike "*$npmGlobal*") { $env:Path = "$npmGlobal;$env:Path" }
 if ($env:Path -notlike "*$localBin*") { $env:Path = "$localBin;$env:Path" }
